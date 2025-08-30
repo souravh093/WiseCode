@@ -18,8 +18,6 @@ const DashboardHeader = async () => {
 
   const userDetails = await res.json();
 
-  console.log(userDetails);
-
   if (!res.ok) return <div>Authentication required</div>;
 
   const { email, role } = userDetails?.data?.user;
