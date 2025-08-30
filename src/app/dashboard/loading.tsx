@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import DashboardSkeleton from "@/components/DashboardSkeleton";
 
 const loading = () => {
-  return (
-    <div>loading</div>
-  )
-}
+  return <DashboardSkeleton />;
+};
 
-export default loading
+export default loading;

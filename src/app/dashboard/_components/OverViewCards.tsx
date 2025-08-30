@@ -6,6 +6,7 @@ const OverViewCards = async () => {
   const overViewData = await overviewInfluencer();
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mt-10 container">
+      
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg">Total Influencers</h1>
@@ -15,6 +16,7 @@ const OverViewCards = async () => {
           {overViewData?.data.totalInfluncers || 0}
         </h1>
       </Card>
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg">Total Reach</h1>
@@ -27,6 +29,7 @@ const OverViewCards = async () => {
           B
         </h1>
       </Card>
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg">Avg Engagement</h1>
@@ -39,6 +42,7 @@ const OverViewCards = async () => {
           %
         </h1>
       </Card>
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg">Platforms</h1>
@@ -46,6 +50,7 @@ const OverViewCards = async () => {
         </div>
         <h1 className="text-2xl font-semibold">{4}</h1>
       </Card>
+
     </div>
   );
 };
