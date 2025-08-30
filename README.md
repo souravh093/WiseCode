@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import { TJwtPayload } from "./types/auth.types";
 
-## Getting Started
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-First, run the development server:
+  // Get token from cookie
+  const token = request.cookies.get("auth-token")?.value;
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+  console.log(token, "token");
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  // Public paths that don't require authentication
+  const publicPaths = ["/", "/api/auth/login", "/api/auth/logout"];
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+  // API routes that don't require authentication
+  const isPublicApiRoute = pathname.startsWith("/api/auth/");
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  // Protected paths
+  const protectedPaths = ["/dashboard"];
+  const isProtectedPath = protectedPaths.some((path) =>
+    pathname.startsWith(path)
+  );
 
-## Learn More
+  // If it's a public path or public API route, allow access
+  if (publicPaths.includes(pathname) || isPublicApiRoute) {
+    // If user is already logged in and tries to access root (/), redirect to dashboard
+    if (pathname === "/" && token) {
+      try {
+        const jwtSecret = process.env.JWT_SECRET;
+        if (jwtSecret) {
+          jwt.verify(token, jwtSecret) as TJwtPayload;
+          // Token is valid, redirect to dashboard
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+      } catch (error) {
+        // Token is invalid, continue to login page
+        console.log("Invalid token, continuing to login page");
+      }
+    }
+    return NextResponse.next();
+  }
 
-To learn more about Next.js, take a look at the following resources:
+  // For protected paths, check if user is authenticated
+  if (isProtectedPath) {
+    if (!token) {
+      // No token, redirect to login
+      return NextResponse.redirect(new URL("/", request.url));
+    }
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    try {
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        console.error("JWT_SECRET is not set");
+        return NextResponse.redirect(new URL("/", request.url));
+      }
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+      // Verify token
+      const payload = jwt.verify(token, jwtSecret) as TJwtPayload;
 
-## Deploy on Vercel
+      // Add user data to request headers for use in API routes
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set("x-user-id", payload.id || "");
+      requestHeaders.set("x-user-email", payload.email);
+      requestHeaders.set("x-user-role", payload.role);
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      // Token is invalid, redirect to login
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (public folder)
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};

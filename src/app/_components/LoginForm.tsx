@@ -13,8 +13,14 @@ import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/schema/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const LoginForm = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -23,9 +29,33 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Login failed");
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50">
       <div>
@@ -41,6 +71,13 @@ const LoginForm = () => {
               Enter your credentials to access the influencer directory
             </p>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -54,6 +91,7 @@ const LoginForm = () => {
                         placeholder="Enter your email"
                         {...field}
                         type="email"
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -71,6 +109,7 @@ const LoginForm = () => {
                         placeholder="Enter your password"
                         {...field}
                         type="password"
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -88,8 +127,13 @@ const LoginForm = () => {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full" size={"lg"}>
-                Sign In
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                size={"lg"}
+                disabled={loading}
+              >
+                {loading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </Form>
