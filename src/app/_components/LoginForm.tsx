@@ -79,11 +79,11 @@ const LoginForm = () => {
               />
 
               <div className="mt-4 bg-gray-100 p-2 rounded-md">
-                <h2 className="text-lg font-bold">Demo Credentials:</h2>
-                <p className="text-gray-600">
+                <h2 className="font-semibold">Demo Credentials:</h2>
+                <p className="text-gray-600 text-sm">
                   Admin: admin@example.com / Admin123!
                 </p>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   Viewer: viewer@example.com / Viewer123!
                 </p>
               </div>

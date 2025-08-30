@@ -1,7 +1,3 @@
-import { Form } from "@/components/ui/form";
-import { loginSchema } from "@/schema/auth.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import LoginForm from "./_components/LoginForm";
 import Image from "next/image";
 
@@ -20,9 +16,11 @@ const LoginPage = () => {
             className="w-full h-screen object-cover"
           />
         </div>
-        <div className="z-10 h-screen relative flex items-center justify-start p-10 bg-blue-500/90">
+        <div className="z-10 h-screen relative flex items-center justify-start p-10 bg-primary/90">
           <div>
-            <h1 className="text-6xl text-white max-w-2xl font-bold">WiseCode Influencer Directory</h1>
+            <h1 className="text-6xl text-white max-w-2xl font-bold">
+              WiseCode Influencer Directory
+            </h1>
             <p className="text-lg text-gray-200 mt-4 max-w-xl">
               Manage and discover influencers across all major platforms. Access
               detailed analytics, engagement metrics, and comprehensive
