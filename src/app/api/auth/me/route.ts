@@ -11,10 +11,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "No authentication token found",
+          message: "You are not authenticated",
         },
         { status: 401 }
       );
+
     }
 
     const jwtSecret = process.env.JWT_SECRET;
