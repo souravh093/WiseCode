@@ -2,6 +2,7 @@ import React from "react";
 import { cookies } from "next/headers";
 import { Badge } from "@/components/ui/badge";
 import LogoutButton from "./LogoutButton";
+import Link from "next/link";
 
 const DashboardHeader = async () => {
   const cookieStore = await cookies();
@@ -11,7 +12,7 @@ const DashboardHeader = async () => {
     ? { Cookie: `auth-token=${authToken}` }
     : {};
 
-  const res = await fetch("http://localhost:3000/api/auth/me", {
+  const res = await fetch(`${process.env.NEXT_URL}/api/auth/me`, {
     headers,
     cache: "no-store",
   });
@@ -27,9 +28,9 @@ const DashboardHeader = async () => {
       <div className="container">
         <div className="flex items-center justify-between">
           <div className="flex gap-3 items-center">
-            <h1 className="text-2xl font-bold text-primary">
+            <Link href={"/dashboard"} className="text-2xl font-bold text-primary">
               Influencer Directory
-            </h1>
+            </Link>
             <Badge variant={"outline"}>{role}</Badge>
           </div>
           <div className="flex gap-3 items-center">

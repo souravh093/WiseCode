@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { builderQuery } from "@/utils/builderQuery";
 import { NextRequest, NextResponse } from "next/server";
 import { Platform } from "@prisma/client";
+import { jwtDecode } from "jwt-decode";
 
 export async function GET(request: NextRequest) {
   try {
@@ -92,6 +93,69 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         message: "Failed to retrieve influencers",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    console.log(body, "<-- Request Body");
+
+    const token = request.headers.get("authorization")?.split(" ")[1];
+
+    if (!token) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "No authorization token provided",
+        },
+        { status: 401 }
+      );
+    }
+
+    const decoded = jwtDecode<{ role: string }>(token);
+    if (!decoded) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid authorization token",
+        },
+        { status: 401 }
+      );
+    }
+
+    if (decoded.role !== "ADMIN") {
+      return NextResponse.json(
+        {
+          success: false,
+          status: 401,
+          message: "Unauthorized access",
+        },
+        { status: 401 }
+      );
+    }
+
+    const newInfluencer = await prisma.influencer.create({
+      data: {
+        ...body,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Influencer created successfully",
+      data: newInfluencer,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to create influencer",
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

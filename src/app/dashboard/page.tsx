@@ -6,6 +6,8 @@ import { getAllInfluencers } from "@/service/influencer";
 import PaginationWrapper from "@/components/PaginationWrapper";
 import SearchAndFilter from "./_components/SearchAndFilter";
 import { TQuery } from "@/types/query.types";
+import { loggedUser } from "@/service/auth";
+import CreateInfluencer from "./_components/CreateInfluencers";
 
 const Dashboard = async (props: {
   searchParams: Promise<{
@@ -48,11 +50,13 @@ const Dashboard = async (props: {
   }
 
   const influencers = await getAllInfluencers(queryParams);
+  const currentUser = await loggedUser();
+  console.log("Current User:", currentUser);
   return (
     <div>
-      <DashboardHeader />
       <OverViewCards />
       <SearchAndFilter />
+      {currentUser?.role === "ADMIN" && <CreateInfluencer />}
       <InfluencerTable influencers={influencers?.data} />
       {influencers?.meta?.totalPages > 1 && (
         <PaginationWrapper
