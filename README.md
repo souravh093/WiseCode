@@ -91,3 +91,10 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
+
+
+DATABASE_URL="postgresql://neondb_owner:npg_WcGBgn1iNpZ5@ep-blue-mountain-a18mwoxz-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+JWT_SECRET="a8f9c2e7d4b6h3j5k8l9m2n6p4q7r9s1t3u5v8w2x4y6z9a1b3c5d7e9f2g4h6j8k0l3m5n7p9q2r4s6t8u0v3w5x7y9z2a4b6c8d0e3f5g7h9j2k4l6m8n0p3q5r7s9t2u4v6w8x0z3a5b7c9d2e4f6g8h0j3k5l7m9n2o4p6q8r0s3t5u7v9w2x4y6z8a1b3c5d7e9f2g4h6i8j0k3l5m7n9o2p4q6r8s0t3u5v7w9x2y4z6"
+JWT_EXPIRES_IN="7d"
+NEXT_URL="http://localhost:3000"
