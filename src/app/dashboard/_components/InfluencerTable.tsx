@@ -10,13 +10,21 @@ import {
 } from "@/components/ui/table";
 import { influencersTableHeaders } from "@/constant/table-header/influencersTableHeaders";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Edit } from "lucide-react";
 import { PlatformIcon } from "@/utils/platformIcons";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import DetailsModal from "./DetailsModal";
+import DeleteInfluencer from "./DeleteInfluencer";
+import { loggedUser } from "@/service/auth";
 
-const InfluencerTable = ({ influencers }: { influencers: TInfluencer[] }) => {
+const InfluencerTable = async ({
+  influencers,
+}: {
+  influencers: TInfluencer[];
+}) => {
+  const currentUser = await loggedUser();
   return (
     <div className="overflow-x-auto container mt-10">
       <div className="shadow-sm border p-4 rounded-md">
@@ -88,10 +96,19 @@ const InfluencerTable = ({ influencers }: { influencers: TInfluencer[] }) => {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
-                  <Link href={`/influencer/${influencer.id}`}>
-                    <Button variant="outline">Details</Button>
-                  </Link>
+                <TableCell className="text-right flex items-center gap-1">
+                  <DetailsModal influencer={influencer} />
+                  {currentUser?.role === "ADMIN" && (
+                    <>
+                      <Link href={`/dashboard/${influencer.id}`}>
+                        <Button variant="default" size="sm" className="cursor-pointer">
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <DeleteInfluencer id={influencer.id} />
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

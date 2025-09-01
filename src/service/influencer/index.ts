@@ -1,6 +1,7 @@
 "use server";
 
 import { TQuery } from "@/types/query.types";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
@@ -47,9 +48,82 @@ export const createInfluencer = async (data: FieldValues) => {
       throw new Error("Failed to create influencer");
     }
 
+    revalidatePath("/dashboard");
+
     return response.json();
   } catch (error) {
     console.error("Error creating influencer:", error);
+    throw error;
+  }
+};
+
+
+export const getInfluencerById = async (id: string) => {
+  try {
+    const cookie = await cookies();
+    const token = cookie.get("auth-token")?.value;
+    const response = await fetch(`${process.env.NEXT_URL}/api/influencers/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch influencer");
+    }
+
+    const data = await response.json();
+    return await data.data;
+  } catch (error) {
+    console.error("Error fetching influencer:", error);
+    throw error;
+  }
+};
+
+export const deleteInfluencer = async (id: string) => {
+  try {
+    const cookie = await cookies();
+    const token = cookie.get("auth-token")?.value;
+
+    const response = await fetch(`${process.env.NEXT_URL}/api/influencers/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete influencer");
+    }
+
+    revalidatePath("/dashboard");
+
+    return response.json();
+  } catch (error) {
+    console.error("Error deleting influencer:", error);
+    throw error;
+  }
+};
+
+export const updateInfluencer = async (id: string, data: FieldValues) => {
+  try {
+    const cookie = await cookies();
+    const token = cookie.get("auth-token")?.value;
+
+    const response = await fetch(`${process.env.NEXT_URL}/api/influencers/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    revalidatePath("/dashboard");
+
+    return response.json();
+  } catch (error) {
+    console.error("Error updating influencer:", error);
     throw error;
   }
 };

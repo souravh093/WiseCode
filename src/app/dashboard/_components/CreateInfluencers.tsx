@@ -7,7 +7,7 @@ const CreateInfluencer = () => {
   return (
     <div className="container mt-5">
       <Link href="/dashboard/create-influencer">
-        <Button size={"lg"}>
+        <Button size={"lg"} className="cursor-pointer">
           <Plus className="size-4" />
           Add New Influencer
         </Button>

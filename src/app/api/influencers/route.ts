@@ -104,8 +104,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log(body, "<-- Request Body");
-
     const token = request.headers.get("authorization")?.split(" ")[1];
 
     if (!token) {
@@ -162,3 +160,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

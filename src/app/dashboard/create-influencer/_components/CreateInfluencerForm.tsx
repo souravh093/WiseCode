@@ -35,8 +35,11 @@ import { FormData, formSchema } from "@/schema/influencer.schema";
 import { categories } from "@/constant/categories";
 import { useTransition } from "react";
 import { createInfluencer } from "@/service/influencer";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CreateInfluencerForm() {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -56,7 +59,12 @@ export default function CreateInfluencerForm() {
     startTransition(async () => {
       const response = await createInfluencer(data);
 
-      console.log(response, "<-- Create Influencer Response");
+      if (response.success) {
+        toast.success("Influencer created successfully!");
+        router.push("/dashboard");
+      } else {
+        toast.error(response.message || "Failed to create influencer");
+      }
     });
   };
 
@@ -94,7 +102,6 @@ export default function CreateInfluencerForm() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Basic Information */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -186,7 +193,6 @@ export default function CreateInfluencerForm() {
               </CardContent>
             </Card>
 
-            {/* Metrics & Location */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -270,7 +276,6 @@ export default function CreateInfluencerForm() {
               </CardContent>
             </Card>
 
-            {/* Categories */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -311,7 +316,6 @@ export default function CreateInfluencerForm() {
                         </div>
                       )}
 
-                      {/* Category Selection */}
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                         {categories.map((category) => (
                           <div
@@ -344,14 +348,13 @@ export default function CreateInfluencerForm() {
               </CardContent>
             </Card>
 
-            {/* Submit Button */}
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="px-8"
-                disabled={form.formState.isSubmitting}
+                className="px-8 cursor-pointer"
+                disabled={isPending}
               >
-                {form.formState.isSubmitting ? (
+                {isPending ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                     Creating...

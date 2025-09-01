@@ -13,7 +13,6 @@ export const middleware = async (req: NextRequest) => {
     },
   });
 
-  // If user is not authenticated
   if (!currentUser?.email) {
     if (pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/", req.url));
@@ -21,7 +20,6 @@ export const middleware = async (req: NextRequest) => {
     return res;
   }
 
-  // If user is authenticated and trying to access root, redirect to dashboard
   if (pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }

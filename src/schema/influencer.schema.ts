@@ -23,4 +23,29 @@ export const formSchema = z.object({
   categories: z.array(z.string()).min(1, "Please select at least one category"),
 });
 
+export const formSchemaUpdate = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name is too long"),
+  platform: z.nativeEnum(Platform),
+  username: z
+    .string()
+    .min(1, "Username is required")
+    .max(50, "Username is too long")
+    .regex(
+      /^[a-zA-Z0-9._-]+$/,
+      "Username can only contain letters, numbers, dots, underscores, and hyphens"
+    ),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  followers: z.string().regex(/^\d+$/, "Followers must be a valid number"),
+  engagementRate: z.string().regex(/^\d+(\.\d+)?$/, "Invalid engagement rate"),
+  country: z
+    .string()
+    .min(2, "Please select a country")
+    .max(2, "Invalid country code"),
+  categories: z.array(z.string()).min(1, "Please select at least one category"),
+});
+
 export type FormData = z.infer<typeof formSchema>;
+export type FormDataUpdate = z.infer<typeof formSchemaUpdate>;
