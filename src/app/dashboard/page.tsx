@@ -1,5 +1,4 @@
 import React from "react";
-import DashboardHeader from "./_components/DashboardHeader";
 import OverViewCards from "./_components/OverViewCards";
 import InfluencerTable from "./_components/InfluencerTable";
 import { getAllInfluencers } from "@/service/influencer";
